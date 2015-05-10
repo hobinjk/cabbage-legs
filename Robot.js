@@ -4,9 +4,21 @@ function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
   this.y = y;
   this.world = world;
 
-  var chassisShape = new p2.Rectangle(chassisLength, chassisWidth);
+  this.chassisLength = chassisLength;
+  this.chassisWidth = chassisWidth;
+
+  this.frontGenome = frontGenome;
+  this.rearGenome = rearGenome;
+}
+
+/**
+ * Add the robot to the world
+ */
+Robot.prototype.add = function() {
+  var chassisShape = new p2.Rectangle(this.chassisLength, this.chassisWidth);
   chassisShape.collisionGroup = CONTACT_CHASSIS;
   chassisShape.collisionMask = GROUND;
+
   this.chassis = new p2.Body({
     mass: chassisShape.width * chassisShape.height / 3000,
     position: [this.x, this.y]
@@ -15,38 +27,52 @@ function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
   this.chassis.addShape(chassisShape);
   this.world.addBody(this.chassis);
 
-  var frontLinkage = new KlannLinkage(this.world,
-                                      this.x + chassisLength / 2,
+  this.frontLinkage = new KlannLinkage(this.world,
+                                      this.x + this.chassisLength / 2,
                                       this.y,
-                                      frontGenome,
+                                      this.frontGenome,
                                       false);
-  frontLinkage.add();
+  this.frontLinkage.add();
 
-  var rearLinkage = new KlannLinkage(this.world,
-                                     this.x - chassisLength / 2,
+  this.rearLinkage = new KlannLinkage(this.world,
+                                     this.x - this.chassisLength / 2,
                                      this.y,
-                                     rearGenome,
+                                     this.rearGenome,
                                      true);
-  rearLinkage.add();
+  this.rearLinkage.add();
 
-  var frontConstraint = new p2.LockConstraint(
+  this.frontConstraint = new p2.LockConstraint(
       this.chassis,
-      frontLinkage.baseBody,
-      {localAngleB: frontGenome.baseAngle}
+      this.frontLinkage.baseBody,
+      {localAngleB: this.frontGenome.baseAngle}
   );
 
-  var rearConstraint = new p2.LockConstraint(
+  this.rearConstraint = new p2.LockConstraint(
       this.chassis,
-      rearLinkage.baseBody,
-      {localAngleB: -rearGenome.baseAngle}
+      this.rearLinkage.baseBody,
+      {localAngleB: -this.rearGenome.baseAngle}
   );
 
-  var driverConstraint = new p2.GearConstraint(
-      frontLinkage.driverBody,
-      rearLinkage.driverBody
+  this.driverConstraint = new p2.GearConstraint(
+      this.frontLinkage.driverBody,
+      this.rearLinkage.driverBody
   );
 
-  this.world.addConstraint(frontConstraint);
-  this.world.addConstraint(rearConstraint);
-  this.world.addConstraint(driverConstraint);
-}
+  this.world.addConstraint(this.frontConstraint);
+  this.world.addConstraint(this.rearConstraint);
+  this.world.addConstraint(this.driverConstraint);
+};
+
+/**
+ * Remove the Robot from the world
+ */
+Robot.prototype.remove = function() {
+  this.rearLinkage.remove();
+  this.frontLinkage.remove();
+
+  this.world.removeConstraint(this.frontConstraint);
+  this.world.removeConstraint(this.rearConstraint);
+  this.world.removeConstraint(this.driverConstraint);
+
+  this.world.removeBody(this.chassis);
+};

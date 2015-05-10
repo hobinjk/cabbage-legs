@@ -25,6 +25,9 @@ function KlannLinkage(world, x, y, genome, mirror) {
   this.legShape = new p2.Rectangle(genome.legLength, this.stickWidth);
 
   this.mirror = mirror;
+
+  this.pins = [];
+  this.bodies = [];
 }
 
 /**
@@ -53,6 +56,7 @@ KlannLinkage.prototype.addRectangle = function(rectangle, x, y, angle) {
   }
   body.addShape(rectangle);
   this.world.addBody(body);
+  this.bodies.push(body);
 
   return body;
 };
@@ -74,6 +78,7 @@ KlannLinkage.prototype.addPin = function(bodyA, bodyB, localPivotA,
   constraint.setStiffness(1e12);
   constraint.setRelaxation(2);
   this.world.addConstraint(constraint);
+  this.pins.push(constraint);
 };
 
 /**
@@ -195,4 +200,20 @@ KlannLinkage.prototype.add = function() {
   this.addPin(this.driverBody, rightBodies.middleSpindlyBody,
          [-this.driverShape.width / 2, 0],
          [-this.middleSpindlyShape.width / 2, 0]);
+};
+
+/**
+ * Remove the KlannLinkage from the world
+ */
+KlannLinkage.prototype.remove = function() {
+  this.world.removeConstraint(this.driverMotor);
+  this.world.removeBody(this.driverBody);
+
+  for (var i = 0; i < this.pins.length; i++) {
+    this.world.removeConstraint(this.pins[i]);
+  }
+
+  for (var i = 0; i < this.bodies.length; i++) {
+    this.world.removeBody(this.bodies[i]);
+  }
 };
