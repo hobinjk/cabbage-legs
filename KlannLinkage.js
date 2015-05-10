@@ -36,11 +36,21 @@ function KlannLinkage(world, x, y, genome, mirror) {
  * @return {p2.Body}
  */
 KlannLinkage.prototype.addRectangle = function(rectangle, x, y, angle) {
-  var body = new p2.Body({
-    mass: rectangle.width * rectangle.height / 2000,
-    position: [this.offsetX + x, this.offsetY + y],
-    angle: angle
-  });
+  var body = null;
+  if (!this.mirror) {
+    body = new p2.Body({
+      mass: rectangle.width * rectangle.height / 2000,
+      position: [this.offsetX + x, this.offsetY + y],
+      angle: angle
+    });
+  } else {
+    body = new p2.Body({
+      mass: rectangle.width * rectangle.height / 2000,
+      position: [this.offsetX - x,
+                 this.offsetY + y],
+      angle: Math.PI - angle
+    });
+  }
   body.addShape(rectangle);
   this.world.addBody(body);
 
@@ -89,12 +99,14 @@ KlannLinkage.prototype.addCenteredRectangle = function(rectangle, x, y, angle) {
 KlannLinkage.prototype.addLinkage = function() {
   var bodies = {};
 
+  this.topSpindlyShape.collisionGroup = CONTACT_CHASSIS;
   this.topSpindlyShape.collisionMask = GROUND;
   bodies.topSpindlyBody = this.addCenteredRectangle(
                                 this.topSpindlyShape,
                                 2.5, 1 + this.topSpindlyShape.height / 2,
                                 Math.PI / 2);
 
+  this.bottomSpindlyShape.collisionGroup = CONTACT_CHASSIS;
   this.bottomSpindlyShape.collisionMask = GROUND;
   bodies.bottomSpindlyBody = this.addRectangle(
                                 this.bottomSpindlyShape,
@@ -105,17 +117,28 @@ KlannLinkage.prototype.addLinkage = function() {
   bodies.bigLegBody = this.addCenteredRectangle(this.legShape, 3.5, 1,
                                              -Math.PI / 3);
 
+  this.middleSpindlyShape.collisionGroup = CONTACT_CHASSIS;
   this.middleSpindlyShape.collisionMask = GROUND;
   bodies.middleSpindlyBody = this.addCenteredRectangle(this.middleSpindlyShape,
                                            1, 0, -Math.PI / 7);
 
-  this.addPin(this.baseBody, bodies.topSpindlyBody,
-         [this.baseShape.width / 2, this.baseShape.height / 2],
-         [-this.topSpindlyShape.width / 2, 0]);
+  if (!this.mirror) {
+    this.addPin(this.baseBody, bodies.topSpindlyBody,
+           [this.baseShape.width / 2, this.baseShape.height / 2],
+           [-this.topSpindlyShape.width / 2, 0]);
 
-  this.addPin(this.baseBody, bodies.bottomSpindlyBody,
-         [this.baseShape.width / 2, -this.baseShape.height / 2],
-         [-this.bottomSpindlyShape.width / 2, 0]);
+    this.addPin(this.baseBody, bodies.bottomSpindlyBody,
+           [this.baseShape.width / 2, -this.baseShape.height / 2],
+           [-this.bottomSpindlyShape.width / 2, 0]);
+  } else {
+    this.addPin(this.baseBody, bodies.topSpindlyBody,
+           [-this.baseShape.width / 2, this.baseShape.height / 2],
+           [-this.topSpindlyShape.width / 2, 0]);
+
+    this.addPin(this.baseBody, bodies.bottomSpindlyBody,
+           [-this.baseShape.width / 2, -this.baseShape.height / 2],
+           [-this.bottomSpindlyShape.width / 2, 0]);
+  }
 
   this.addPin(bodies.topSpindlyBody, bodies.bigLegBody,
          [this.topSpindlyShape.width / 2, 0],
@@ -141,13 +164,16 @@ KlannLinkage.prototype.add = function() {
                                     this.baseShape.width / 2, 0, 0);
 
   this.driverShape.collisionMask = GROUND;
-  var driverBody = null;
-  driverBody = this.addRectangle(this.driverShape,
+  this.driverBody = this.addRectangle(this.driverShape,
                                  0,
                                  -this.driverShape.height / 2, 0);
-  this.driverMotor = new p2.RevoluteConstraint(driverBody, this.baseBody, {
+  var driverMotorX = -this.baseShape.width / 2;
+  if (this.mirror) {
+    driverMotorX = this.baseShape.width / 2;
+  }
+  this.driverMotor = new p2.RevoluteConstraint(this.driverBody, this.baseBody, {
     localPivotA: [0, 0],
-    localPivotB: [-this.baseShape.width / 2, 0],
+    localPivotB: [driverMotorX, 0],
     collideConnected: false,
     maxForce: 10000000
   });
@@ -162,11 +188,11 @@ KlannLinkage.prototype.add = function() {
   var leftBodies = this.addLinkage();
   var rightBodies = this.addLinkage();
 
-  this.addPin(driverBody, leftBodies.middleSpindlyBody,
+  this.addPin(this.driverBody, leftBodies.middleSpindlyBody,
          [this.driverShape.width / 2, 0],
          [-this.middleSpindlyShape.width / 2, 0]);
 
-  this.addPin(driverBody, rightBodies.middleSpindlyBody,
+  this.addPin(this.driverBody, rightBodies.middleSpindlyBody,
          [-this.driverShape.width / 2, 0],
          [-this.middleSpindlyShape.width / 2, 0]);
 };

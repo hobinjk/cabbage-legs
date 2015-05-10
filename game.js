@@ -7,6 +7,12 @@ var frameHeight = 30;
 var currentFrameX = 0;
 var currentFrameY = 0;
 
+var alphaX = 0.04;
+var alphaY = 0.007;
+
+var robots = [];
+var terrain = null;
+
 function startLinkages() {
   renderer = new p2.WebGLRenderer(function() {
     var world = new p2.World({
@@ -18,27 +24,18 @@ function startLinkages() {
 
     world.defaultContactMaterial.friction = 500;
 
-    var planeShape = new p2.Plane();
-    planeShape.collisionGroup = GROUND;
-    planeShape.collisionMask = CONTACT_LEG;
+    terrain = new Terrain(world, -10, 0);
 
-    var planeBody = new p2.Body({
-      mass: 0
-    });
-    planeBody.addShape(planeShape);
-    world.addBody(planeBody);
-
-    window.robots = [];
-    for (var i = 0; i < 2; i++) {
+    for (var i = 0; i < 3; i++) {
       // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
       // bottomSpindlyLength, middleSpindlyLength, legLength
-      var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6,
-                                        1.8, 1.8, 0.9, 3.25, 5.5 - 0.5 * i);
+      var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6 + 0.12 * i,
+                                        1.8, 1.8 + 0.4, 0.9, 3.25, 5.5);
 
-      window.robots[i] = new Robot(world, 0, 6, 4, 2, klannGenome, klannGenome);
+      robots[i] = new Robot(world, 5, 12, 3, 2, klannGenome, klannGenome);
     }
 
-    updateFrame(this, window.robots);
+    updateFrame(this);
 
     this.frame(0, 0, frameWidth, frameHeight);
   }, {
@@ -47,12 +44,11 @@ function startLinkages() {
   // renderer.paused = true;
 }
 
-function smooth(oldVal, newVal) {
-  var alpha = 0.04;
+function smooth(oldVal, newVal, alpha) {
   return oldVal * (1 - alpha) + newVal * alpha;
 }
 
-function updateFrame(renderer, robots) {
+function updateFrame(renderer) {
   var maxX = 0;
   var maxY = 0;
   for (var i = 0; i < robots.length; i++) {
@@ -66,8 +62,13 @@ function updateFrame(renderer, robots) {
       maxY = robotY;
     }
   }
-  currentFrameX = smooth(currentFrameX, maxX);
-  currentFrameY = smooth(currentFrameY, maxY);
+  if (maxX < currentFrameX) {
+    maxX = currentFrameX;
+  }
+  currentFrameX = smooth(currentFrameX, maxX, alphaX);
+  currentFrameY = smooth(currentFrameY, maxY, alphaY);
+
+  terrain.update(maxX);
 
   renderer.frame(currentFrameX + frameWidth / 4, currentFrameY,
                  frameWidth, frameHeight);

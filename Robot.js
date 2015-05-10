@@ -5,6 +5,7 @@ function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
   this.world = world;
 
   var chassisShape = new p2.Rectangle(chassisLength, chassisWidth);
+  chassisShape.collisionGroup = CONTACT_CHASSIS;
   chassisShape.collisionMask = GROUND;
   this.chassis = new p2.Body({
     mass: chassisShape.width * chassisShape.height / 3000,
@@ -22,8 +23,7 @@ function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
   frontLinkage.add();
 
   var rearLinkage = new KlannLinkage(this.world,
-                                     this.x - rearGenome.baseWidth -
-                                              chassisLength / 2,
+                                     this.x - chassisLength / 2,
                                      this.y,
                                      rearGenome,
                                      true);
@@ -38,9 +38,15 @@ function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
   var rearConstraint = new p2.LockConstraint(
       this.chassis,
       rearLinkage.baseBody,
-      {localAngleB: rearGenome.baseAngle}
+      {localAngleB: -rearGenome.baseAngle}
+  );
+
+  var driverConstraint = new p2.GearConstraint(
+      frontLinkage.driverBody,
+      rearLinkage.driverBody
   );
 
   this.world.addConstraint(frontConstraint);
   this.world.addConstraint(rearConstraint);
+  this.world.addConstraint(driverConstraint);
 }

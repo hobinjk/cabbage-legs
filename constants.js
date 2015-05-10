@@ -1,2 +1,3 @@
 var CONTACT_LEG = 1;
-var GROUND = 2;
+var CONTACT_CHASSIS = 2;
+var GROUND = 4;
