@@ -22,18 +22,16 @@ function startLinkages() {
 
     this.setWorld(world);
 
-    world.defaultContactMaterial.friction = 500;
+    world.defaultContactMaterial.friction = 1000;
 
     terrain = new Terrain(world, -10, 0);
-
-    for (var i = 0; i < 3; i++) {
-      // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
-      // bottomSpindlyLength, middleSpindlyLength, legLength
-      var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6 + 0.12 * i,
-                                        1.8, 1.8 + 0.4, 0.9, 3.25, 5.5);
-
-      robots[i] = new Robot(world, 5, 12, 3, 2, klannGenome, klannGenome);
-    }
+    population = new Population(world, 0.05, 5, 12);
+    // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
+    // bottomSpindlyLength, middleSpindlyLength, legLength
+    var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6 + 0.3,
+                                      1.8, 1.8 + 0.4, 0.9, 3.25, 5.5);
+    var baseRobotGenome = new RobotGenome(3, 2, klannGenome, klannGenome);
+    robots = population.synthesize(baseRobotGenome, 4);
 
     updateFrame(this);
 
@@ -52,9 +50,12 @@ function smooth(oldVal, newVal, alphaBase) {
 function updateFrame(renderer) {
   var maxX = 0;
   var maxY = 0;
+
+  var anyAlive = false;
   for (var i = 0; i < robots.length; i++) {
-    var robotX = robots[i].chassis.position[0];
-    var robotY = robots[i].chassis.position[1];
+    robots[i].update();
+    var robotX = robots[i].maxX;
+    var robotY = robots[i].maxY;
     if (robotX > maxX) {
       maxX = robotX;
     }
@@ -62,20 +63,24 @@ function updateFrame(renderer) {
     if (robotY > maxY) {
       maxY = robotY;
     }
+
+    anyAlive = anyAlive || robots[i].alive;
   }
-  if (maxX < currentFrameX) {
-    maxX = currentFrameX;
-  }
+
   currentFrameX = smooth(currentFrameX, maxX, alphaX);
   currentFrameY = smooth(currentFrameY, maxY, alphaY);
 
   terrain.update(maxX);
 
-  renderer.frame(currentFrameX + frameWidth / 4, currentFrameY,
+  renderer.frame(currentFrameX + frameWidth / 8, currentFrameY,
                  frameWidth, frameHeight);
+
+  if (!anyAlive) {
+    robots = population.spawn(robots);
+  }
   window.setTimeout(function() {
     updateFrame(renderer, robots);
-  }, 33);
+  }, 100);
 }
 
 startLinkages();

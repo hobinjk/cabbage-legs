@@ -1,14 +1,22 @@
-function Robot(world, x, y, chassisLength, chassisWidth, frontGenome,
-               rearGenome) {
+function Robot(world, x, y, genome) {
   this.x = x;
+  this.maxX = x;
   this.y = y;
   this.world = world;
 
-  this.chassisLength = chassisLength;
-  this.chassisWidth = chassisWidth;
+  this.genome = genome;
 
-  this.frontGenome = frontGenome;
-  this.rearGenome = rearGenome;
+  this.chassisLength = genome.chassisLength;
+  this.chassisWidth = genome.chassisWidth;
+
+  this.frontGenome = genome.frontGenome;
+  this.rearGenome = genome.rearGenome;
+
+  this.lastMovement = Date.now();
+  this.alive = true;
+  this.deathTime = 5000;
+
+  this.add();
 }
 
 /**
@@ -75,4 +83,26 @@ Robot.prototype.remove = function() {
   this.world.removeConstraint(this.driverConstraint);
 
   this.world.removeBody(this.chassis);
+};
+
+/**
+ * Update the Robot's simulation
+ */
+Robot.prototype.update = function() {
+  if (!this.alive) {
+    return;
+  }
+
+  this.x = this.chassis.position[0];
+  this.y = this.chassis.position[1];
+
+  if (this.maxX < this.x) {
+    this.maxX = this.x;
+    this.lastMovement = Date.now();
+  }
+
+  if (this.lastMovement + this.deathTime < Date.now()) {
+    this.remove();
+    this.alive = false;
+  }
 };

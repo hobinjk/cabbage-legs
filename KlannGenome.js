@@ -21,3 +21,20 @@ function KlannGenome(baseWidth, baseHeight, baseAngle, driverLength,
   this.middleSpindlyLength = middleSpindlyLength;
   this.legLength = legLength;
 }
+
+/**
+ * @param {Function} mutator
+ * @return {KlannGenome} Single-parent mutated genome
+ */
+KlannGenome.prototype.mutateWith = function(mutator) {
+  return new KlannGenome(
+    mutator(this.baseWidth),
+    mutator(this.baseHeight),
+    mutator(this.baseAngle),
+    mutator(this.driverLength),
+    mutator(this.topSpindlyLength),
+    mutator(this.bottomSpindlyLength),
+    mutator(this.middleSpindlyLength),
+    mutator(this.legLength)
+  );
+};
