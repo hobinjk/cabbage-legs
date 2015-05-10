@@ -44,7 +44,8 @@ function startLinkages() {
   // renderer.paused = true;
 }
 
-function smooth(oldVal, newVal, alpha) {
+function smooth(oldVal, newVal, alphaBase) {
+  var alpha = alphaBase * Math.max(Math.abs((oldVal - newVal) / 4), 1);
   return oldVal * (1 - alpha) + newVal * alpha;
 }
 
