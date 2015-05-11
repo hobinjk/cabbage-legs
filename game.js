@@ -85,9 +85,9 @@ function updateFrame(renderer) {
   if (!anyAlive) {
     robots = population.spawn(robots);
   }
-  window.setTimeout(function() {
+  window.requestAnimationFrame(function() {
     updateFrame(renderer, robots);
-  }, 100);
+  });
 }
 
 startLinkages();
