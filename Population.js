@@ -2,14 +2,16 @@
  * @constructor
  * @param {p2.World} world
  * @param {number} mutationRate
+ * @param {number} eliteClones
  * @param {number} startX
  * @param {number} startY
  */
-function Population(world, mutationRate, startX, startY) {
+function Population(world, mutationRate, eliteClones, startX, startY) {
   this.world = world;
   this.mutationRate = mutationRate;
   this.startX = startX;
   this.startY = startY;
+  this.eliteClones = eliteClones;
 }
 
 /**
@@ -38,9 +40,15 @@ Population.prototype.spawn = function(deadRobots) {
   });
   var bestRobot = deadRobots[0];
   var robots = [];
-  for (var i = 0; i < deadRobots.length; i++) {
+  for (var i = 0; i < this.eliteClones; i++) {
+    var robotGenome = deadRobots[i].genome;
+    var newRobot = new Robot(this.world, this.startX, this.startY, robotGenome);
+    robots.push(newRobot);
+  }
+
+  for (var i = this.eliteClones; i < deadRobots.length; i++) {
     var robotGenome = this.mutateRobotGenome(bestRobot.genome);
-    var newRobot = new Robot(this.world, 5, 12, robotGenome);
+    var newRobot = new Robot(this.world, this.startX, this.startY, robotGenome);
     robots.push(newRobot);
   }
   return robots;

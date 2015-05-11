@@ -12,6 +12,7 @@ var alphaY = 0.007;
 
 var robots = [];
 var terrain = null;
+var population = null;
 
 function startLinkages() {
   renderer = new p2.WebGLRenderer(function() {
@@ -25,13 +26,14 @@ function startLinkages() {
     world.defaultContactMaterial.friction = 1000;
 
     terrain = new Terrain(world, -10, 0);
-    population = new Population(world, 0.05, 5, 12);
+    population = new Population(world, 0.1, 1, 5, 7);
+
     // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
     // bottomSpindlyLength, middleSpindlyLength, legLength
     var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6 + 0.3,
-                                      1.8, 1.8 + 0.4, 0.9, 3.25, 5.5);
+                                      1.8, 1.8 + 0.4, 0.9, 3.25, 5.5, 1 / 3);
     var baseRobotGenome = new RobotGenome(3, 2, klannGenome, klannGenome);
-    robots = population.synthesize(baseRobotGenome, 4);
+    robots = population.synthesize(baseRobotGenome, 10);
 
     updateFrame(this);
 
@@ -54,6 +56,11 @@ function updateFrame(renderer) {
   var anyAlive = false;
   for (var i = 0; i < robots.length; i++) {
     robots[i].update();
+
+    if (!robots[i].alive) {
+      continue;
+    }
+
     var robotX = robots[i].maxX;
     var robotY = robots[i].maxY;
     if (robotX > maxX) {
@@ -64,7 +71,7 @@ function updateFrame(renderer) {
       maxY = robotY;
     }
 
-    anyAlive = anyAlive || robots[i].alive;
+    anyAlive = true;
   }
 
   currentFrameX = smooth(currentFrameX, maxX, alphaX);
