@@ -26,7 +26,7 @@ function startLinkages() {
     world.defaultContactMaterial.friction = 1000;
 
     terrain = new Terrain(world, -10, 0);
-    population = new Population(world, 0.1, 1, 5, 7);
+    population = new Population(world, 0.1, 10, 1, 5, 7);
 
     // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
     // bottomSpindlyLength, middleSpindlyLength, legLength

@@ -2,27 +2,32 @@
  * @constructor
  * @param {p2.World} world
  * @param {number} mutationRate
+ * @param {number} robotCount
  * @param {number} eliteClones
  * @param {number} startX
  * @param {number} startY
  */
-function Population(world, mutationRate, eliteClones, startX, startY) {
+function Population(world, mutationRate, robotCount, eliteClones,
+                    startX, startY) {
   this.world = world;
   this.mutationRate = mutationRate;
   this.startX = startX;
   this.startY = startY;
   this.eliteClones = eliteClones;
+  this.robotCount = robotCount;
+
+  this.extremeMutationRate = 0.7;
+  this.extremeMutationChance = 0;
 }
 
 /**
  * Synthesize a new population from scratch
  * @param {RobotGenome} baseGenome
- * @param {number} robotCount
  * @return {Array<Robot>}
  */
-Population.prototype.synthesize = function(baseGenome, robotCount) {
+Population.prototype.synthesize = function(baseGenome) {
   var robots = [];
-  for (var i = 0; i < robotCount; i++) {
+  for (var i = 0; i < this.robotCount; i++) {
     var robotGenome = this.mutateRobotGenome(baseGenome);
     robots.push(new Robot(this.world, this.startX, this.startY, robotGenome));
   }
@@ -39,6 +44,7 @@ Population.prototype.spawn = function(deadRobots) {
     return robotB.maxX - robotA.maxX;
   });
   var bestRobot = deadRobots[0];
+
   var robots = [];
   for (var i = 0; i < this.eliteClones; i++) {
     var robotGenome = deadRobots[i].genome;
@@ -70,6 +76,10 @@ Population.prototype.mutateRobotGenome = function(robotGenome) {
  * @return {number} Mutated value
  */
 Population.prototype.mutate = function(value) {
-  var mutationFactor = 1 + (Math.random() - 0.5) * 2 * this.mutationRate;
+  var mutationRate = this.mutationRate;
+  if (Math.random() < this.extremeMutationChance) {
+    mutationRate = this.extremeMutationRate;
+  }
+  var mutationFactor = 1 + (Math.random() - 0.5) * 2 * mutationRate;
   return value * mutationFactor;
 };
