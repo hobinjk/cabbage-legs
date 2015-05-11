@@ -1,5 +1,5 @@
-Legs
-====
+Cabbage Legs
+============
 Or: Boston Dynamics Simulator 2015
 ----------------------------------
 
