@@ -8,11 +8,12 @@ var currentFrameX = 0;
 var currentFrameY = 0;
 
 var alphaX = 0.04;
-var alphaY = 0.007;
+var alphaY = 0.01;
 
 var robots = [];
 var terrain = null;
 var population = null;
+var gui = null;
 
 function startLinkages() {
   renderer = new p2.WebGLRenderer(function() {
@@ -27,6 +28,9 @@ function startLinkages() {
 
     terrain = new Terrain(world, -10, 0);
     population = new Population(world, 0.1, 10, 1, 5, 7);
+
+    var guiParent = document.getElementById('gui-parent');
+    gui = new GUI(guiParent, world, terrain, population);
 
     // baseWidth, baseHeight, baseAngle, driverLength, topSpindlyLength,
     // bottomSpindlyLength, middleSpindlyLength, legLength
@@ -62,12 +66,9 @@ function updateFrame(renderer) {
     }
 
     var robotX = robots[i].maxX;
-    var robotY = robots[i].maxY;
+    var robotY = robots[i].y;
     if (robotX > maxX) {
       maxX = robotX;
-    }
-
-    if (robotY > maxY) {
       maxY = robotY;
     }
 
@@ -83,6 +84,8 @@ function updateFrame(renderer) {
                  frameWidth, frameHeight);
 
   if (!anyAlive) {
+    gui.addGenerationResults(robots);
+
     robots = population.spawn(robots);
   }
   window.requestAnimationFrame(function() {
