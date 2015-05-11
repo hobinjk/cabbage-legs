@@ -14,7 +14,7 @@ function Robot(world, x, y, genome) {
 
   this.lastMovement = Date.now();
   this.alive = true;
-  this.deathTime = 5000;
+  this.deathTime = 8000;
 
   this.add();
 }
@@ -96,7 +96,7 @@ Robot.prototype.update = function() {
   this.x = this.chassis.position[0];
   this.y = this.chassis.position[1];
 
-  if (this.maxX < this.x) {
+  if (this.maxX + 0.2 < this.x) {
     this.maxX = this.x;
     this.lastMovement = Date.now();
   }
