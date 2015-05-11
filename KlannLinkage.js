@@ -5,13 +5,16 @@
  * @param {p2.World} world
  * @param {number} x
  * @param {number} y
+ * @param {number} color
  * @param {KlannGenome} genome
  * @param {Boolean} mirror
  */
-function KlannLinkage(world, x, y, genome, mirror) {
+function KlannLinkage(world, x, y, color, genome, mirror) {
   this.world = world;
   this.offsetX = x;
   this.offsetY = y;
+  this.color = color;
+
   this.stickWidth = 0.2;
 
   this.baseShape = new p2.Rectangle(genome.baseWidth, genome.baseHeight);
@@ -55,6 +58,7 @@ KlannLinkage.prototype.addRectangle = function(rectangle, x, y, angle) {
       angle: Math.PI - angle
     });
   }
+  body.color = this.color;
   body.addShape(rectangle);
   this.world.addBody(body);
   this.bodies.push(body);

@@ -16,6 +16,8 @@ function Robot(world, x, y, genome) {
   this.alive = true;
   this.deathTime = 8000;
 
+  this.color = parseInt(ColorUtils.randomPastelHex(), 16);
+
   this.add();
 }
 
@@ -32,12 +34,15 @@ Robot.prototype.add = function() {
     position: [this.x, this.y]
   });
 
+  this.chassis.color = this.color;
+
   this.chassis.addShape(chassisShape);
   this.world.addBody(this.chassis);
 
   this.frontLinkage = new KlannLinkage(this.world,
                                       this.x + this.chassisLength / 2,
                                       this.y,
+                                      this.color,
                                       this.frontGenome,
                                       false);
   this.frontLinkage.add();
@@ -45,6 +50,7 @@ Robot.prototype.add = function() {
   this.rearLinkage = new KlannLinkage(this.world,
                                      this.x - this.chassisLength / 2,
                                      this.y,
+                                     this.color,
                                      this.rearGenome,
                                      true);
   this.rearLinkage.add();

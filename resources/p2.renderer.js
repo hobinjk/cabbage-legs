@@ -17767,8 +17767,8 @@ WebGLRenderer.prototype.drawRenderable = function(obj, graphics, color, lineColo
 WebGLRenderer.prototype.addRenderable = function(obj){
     var lw = this.lineWidth;
 
-    // Random color
-    var color = parseInt(randomPastelHex(),16),
+    // Default to random color
+    var color = obj.color || parseInt(randomPastelHex(),16),
         lineColor = 0x000000;
 
     var zero = [0,0];
