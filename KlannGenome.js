@@ -8,10 +8,11 @@
  * @param {number} bottomSpindlyLength
  * @param {number} middleSpindlyLength
  * @param {number} legLength
+ * @param {number} legAttachment - Attachment point of spindly to leg
  */
 function KlannGenome(baseWidth, baseHeight, baseAngle, driverLength,
                      topSpindlyLength, bottomSpindlyLength,
-                     middleSpindlyLength, legLength) {
+                     middleSpindlyLength, legLength, legAttachment) {
   this.baseWidth = baseWidth;
   this.baseHeight = baseHeight;
   this.baseAngle = baseAngle;
@@ -20,6 +21,7 @@ function KlannGenome(baseWidth, baseHeight, baseAngle, driverLength,
   this.bottomSpindlyLength = bottomSpindlyLength;
   this.middleSpindlyLength = middleSpindlyLength;
   this.legLength = legLength;
+  this.legAttachment = Math.min(legAttachment, 1);
 }
 
 /**
@@ -35,6 +37,7 @@ KlannGenome.prototype.mutateWith = function(mutator) {
     mutator(this.topSpindlyLength),
     mutator(this.bottomSpindlyLength),
     mutator(this.middleSpindlyLength),
-    mutator(this.legLength)
+    mutator(this.legLength),
+    mutator(this.legAttachment)
   );
 };

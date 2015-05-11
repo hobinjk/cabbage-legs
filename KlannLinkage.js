@@ -23,6 +23,7 @@ function KlannLinkage(world, x, y, genome, mirror) {
   this.middleSpindlyShape = new p2.Rectangle(genome.middleSpindlyLength,
                                              this.stickWidth);
   this.legShape = new p2.Rectangle(genome.legLength, this.stickWidth);
+  this.legAttachment = genome.legAttachment;
 
   this.mirror = mirror;
 
@@ -155,7 +156,8 @@ KlannLinkage.prototype.addLinkage = function() {
 
   this.addPin(bodies.middleSpindlyBody, bodies.bigLegBody,
          [this.middleSpindlyShape.width / 2, 0],
-         [-this.legShape.width / 6, this.legShape.height / 2]);
+         [this.legShape.width * (this.legAttachment - 0.5),
+          this.legShape.height / 2]);
 
   return bodies;
 };
