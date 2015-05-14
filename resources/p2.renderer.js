@@ -17041,10 +17041,14 @@ WebGLRenderer.prototype.init = function(){
     el.classList.add(Renderer.elementClass);
     el.setAttribute('style','width:100%;');
 
-    var div = this.elementContainer = document.getElementById('p2-container');
+    var div = this.elementContainer = document.createElement('div');
     div.classList.add(Renderer.containerClass);
     div.setAttribute('style','width:100%; height:100%');
     div.appendChild(el);
+
+    var parentContainer = document.getElementById('p2-container');
+    parentContainer.appendChild(div);
+
     el.focus();
     el.oncontextmenu = function(e){
         return false;
