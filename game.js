@@ -103,20 +103,13 @@ function updateRendererDimensions() {
   }
   var width = window.innerWidth;
   var height = window.innerHeight * 3 / 5;
-  var dpr = window.devicePixelRatio;
+  var dpr = window.devicePixelRatio || 1;
 
-  renderer.resize(width, height);
+  renderer.resize(width * dpr, height * dpr);
 }
 
 function addHackyResizer() {
-  var lastTimeout = null;
-
-  window.addEventListener('resize', function() {
-    if (lastTimeout) {
-      clearTimeout(lastTimeout);
-    }
-    lastTimeout = setTimeout(updateRendererDimensions, 100);
-  });
+  window.addEventListener('resize', updateRendererDimensions);
 }
 
 startLinkages();
