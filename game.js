@@ -2,7 +2,7 @@
 
 var renderer = null;
 var frameWidth = 30;
-var frameHeight = 30;
+var frameHeight = 20;
 
 var currentFrameX = 0;
 var currentFrameY = 0;
@@ -42,12 +42,14 @@ function startLinkages() {
     terrain.update(50);
 
     updateFrame(this);
+    addHackyResizer();
 
     this.frame(0, 0, frameWidth, frameHeight);
   }, {
     hideGUI: true
   });
   // renderer.paused = true;
+  updateRendererDimensions();
 }
 
 function smooth(oldVal, newVal, alphaBase) {
@@ -92,6 +94,28 @@ function updateFrame(renderer) {
   }
   window.requestAnimationFrame(function() {
     updateFrame(renderer, robots);
+  });
+}
+
+function updateRendererDimensions() {
+  if (!renderer) {
+    return;
+  }
+  var width = window.innerWidth;
+  var height = window.innerHeight * 3 / 5;
+  var dpr = window.devicePixelRatio;
+
+  renderer.resize(width, height);
+}
+
+function addHackyResizer() {
+  var lastTimeout = null;
+
+  window.addEventListener('resize', function() {
+    if (lastTimeout) {
+      clearTimeout(lastTimeout);
+    }
+    lastTimeout = setTimeout(updateRendererDimensions, 100);
   });
 }
 
