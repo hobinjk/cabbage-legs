@@ -29,7 +29,10 @@ function Terrain(world, x, y) {
  * @param {number} x - new maximum x value to grow for
  */
 Terrain.prototype.update = function(x) {
+  var changed = false;
+
   while (x + this.windowSize > this.lastX) {
+    changed = true;
     var blockWidth = this.randIn(this.minBlockWidth, this.maxBlockWidth);
     var maxAngle = this.lastX * this.anglePerX;
     if (maxAngle > this.maxAngle) {
@@ -58,7 +61,7 @@ Terrain.prototype.update = function(x) {
     this.blockBodies.push(blockBody);
   }
 
-  if (this.onUpdate) {
+  if (changed && this.onUpdate) {
     this.onUpdate();
   }
 };
