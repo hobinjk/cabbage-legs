@@ -64,7 +64,7 @@ NumberInput.prototype.addEventListeners = function() {
  * Update the control
  */
 NumberInput.prototype.update = function() {
-  var newValue = this.rangeElement.value;
+  var newValue = parseFloat(this.rangeElement.value);
   if (this.object[this.key] === newValue) {
     return;
   }
