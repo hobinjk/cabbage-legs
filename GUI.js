@@ -26,7 +26,7 @@ function GUI(parentElement, world, terrain, population) {
       'Chance of extreme mutation', 0, 1, population, 'extremeMutationChance',
       false);
 
-  this.robotCountElement = new NumberInput('Robot count', 5, 12, population,
+  this.robotCountElement = new NumberInput('Robot count', 5, 20, population,
                                            'robotCount', true);
 
   this.regenerateTerrainElement = document.createElement('input');
