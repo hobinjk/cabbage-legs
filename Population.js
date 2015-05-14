@@ -20,6 +20,9 @@ function Population(world, robotCount, eliteClones,
   this.extremeMutationRate = 0.7;
   this.extremeMutationChance = 0;
 
+  this.crossoverRate = 0.2;
+  this.selfCrossoverRate = 0.1;
+
   this.robots = [];
 }
 
@@ -49,6 +52,11 @@ Population.prototype.spawn = function(deadRobots) {
   });
   var eliteRobots = deadRobots.slice(0, this.eliteClones);
 
+  function getRandomElite() {
+    return eliteRobots[Math.floor(Math.random() *
+                                  eliteRobots.length)];
+  }
+
   this.robots = [];
   for (var i = 0; i < this.eliteClones; i++) {
     var robotGenome = eliteRobots[i].genome;
@@ -57,9 +65,27 @@ Population.prototype.spawn = function(deadRobots) {
   }
 
   for (var i = this.eliteClones; i < this.robotCount; i++) {
-    var randomElite = eliteRobots[Math.floor(Math.random() *
-                                  eliteRobots.length)];
+    var randomElite = getRandomElite();
     var robotGenome = this.mutateRobotGenome(randomElite.genome);
+
+    if (Math.random() < this.selfCrossoverRate) {
+      if (Math.random() < 0.5) {
+        robotGenome.frontGenome = robotGenome.rearGenome;
+      } else {
+        robotGenome.rearGenome = robotGenome.frontGenome;
+      }
+    }
+
+    if (Math.random() < this.crossoverRate) {
+      var otherRandomElite = getRandomElite();
+      var otherRobotGenome = this.mutateRobotGenome(otherRandomElite.genome);
+      if (Math.random() < 0.5) {
+        robotGenome.frontGenome = otherRobotGenome.frontGenome;
+      } else {
+        robotGenome.rearGenome = otherRobotGenome.rearGenome;
+      }
+    }
+
     var newRobot = new Robot(this.world, this.startX, this.startY, robotGenome);
     this.robots.push(newRobot);
   }
