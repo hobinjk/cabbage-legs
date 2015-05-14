@@ -17,8 +17,8 @@ function Population(world, robotCount, eliteClones,
   this.baseMutationRate = 0.02;
   this.mutationChance = 0.4;
   this.mutationRate = 0.1;
-  this.extremeMutationRate = 0.7;
-  this.extremeMutationChance = 0;
+  this.extremeMutationRate = 0.6;
+  this.extremeMutationChance = 0.05;
 
   this.crossoverRate = 0.2;
   this.selfCrossoverRate = 0.1;
