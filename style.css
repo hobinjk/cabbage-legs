@@ -23,6 +23,12 @@
 }
 */
 
+#alternative-link {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
 #p2-container {
   flex: 3 1 auto;
 }
@@ -42,3 +48,14 @@
   flex-direction: column;
   flex-wrap: nowrap;
 }
+
+.bang {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 100%;
+  text-align: center;
+  font-family: monospace;
+  color: red;
+}
+
