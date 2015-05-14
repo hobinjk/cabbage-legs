@@ -8,6 +8,7 @@ function Terrain(world, x, y) {
   this.world = world;
   this.lastX = x;
   this.lastY = y;
+  this.lastBlockAngle = 0;
 
   this.startX = x;
   this.startY = y;
@@ -21,8 +22,6 @@ function Terrain(world, x, y) {
 
   this.blockBodies = [];
   this.onUpdate = null;
-
-  this.createSeams = false;
 }
 
 /**
@@ -44,10 +43,22 @@ Terrain.prototype.update = function(x) {
     blockShape.collisionMask = CONTACT_LEG | CONTACT_BASE |
                                CONTACT_TOP_SPINDLY | CONTACT_ROBOT;
 
-    var baseOffsetX = Math.cos(blockAngle) * blockWidth;
-    var midOffsetX = (baseOffsetX + Math.sin(blockAngle) * this.blockHeight) / 2;
-    var baseOffsetY = Math.sin(blockAngle) * blockWidth;
-    var midOffsetY = (baseOffsetY - Math.cos(blockAngle) * this.blockHeight) / 2;
+    var coveringWidth = 0;
+    if (blockAngle - this.lastBlockAngle > 0) {
+      coveringWidth = blockWidth / 4;
+    }
+
+    blockShape.width += coveringWidth;
+
+    var cosAngle = Math.cos(blockAngle);
+    var sinAngle = Math.sin(blockAngle);
+
+    var baseOffsetX = cosAngle * blockWidth;
+    var midOffsetX = (baseOffsetX - cosAngle * coveringWidth +
+                      sinAngle * this.blockHeight) / 2;
+    var baseOffsetY = sinAngle * blockWidth;
+    var midOffsetY = (baseOffsetY - sinAngle * coveringWidth -
+                      cosAngle * this.blockHeight) / 2;
 
     var blockBody = new p2.Body({
       mass: 0,
@@ -56,6 +67,8 @@ Terrain.prototype.update = function(x) {
     });
     this.lastX = this.lastX + baseOffsetX;
     this.lastY = this.lastY + baseOffsetY;
+    this.lastBlockAngle = blockAngle;
+
     blockBody.addShape(blockShape);
     this.world.addBody(blockBody);
     this.blockBodies.push(blockBody);
