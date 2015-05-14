@@ -45,7 +45,8 @@ Terrain.prototype.update = function(x) {
 
     var coveringWidth = 0;
     if (blockAngle - this.lastBlockAngle > 0) {
-      coveringWidth = blockWidth / 4;
+      coveringWidth = this.blockHeight *
+                      Math.sin(blockAngle - this.lastBlockAngle);
     }
 
     blockShape.width += coveringWidth;
