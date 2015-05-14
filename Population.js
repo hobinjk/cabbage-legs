@@ -1,23 +1,26 @@
 /**
  * @constructor
  * @param {p2.World} world
- * @param {number} mutationRate
  * @param {number} robotCount
  * @param {number} eliteClones
  * @param {number} startX
  * @param {number} startY
  */
-function Population(world, mutationRate, robotCount, eliteClones,
+function Population(world, robotCount, eliteClones,
                     startX, startY) {
   this.world = world;
-  this.mutationRate = mutationRate;
   this.startX = startX;
   this.startY = startY;
   this.eliteClones = eliteClones;
   this.robotCount = robotCount;
 
+  this.baseMutationRate = 0.02;
+  this.mutationChance = 0.4;
+  this.mutationRate = 0.1;
   this.extremeMutationRate = 0.7;
   this.extremeMutationChance = 0;
+
+  this.robots = [];
 }
 
 /**
@@ -26,12 +29,13 @@ function Population(world, mutationRate, robotCount, eliteClones,
  * @return {Array<Robot>}
  */
 Population.prototype.synthesize = function(baseGenome) {
-  var robots = [];
+  this.robots = [];
   for (var i = 0; i < this.robotCount; i++) {
     var robotGenome = this.mutateRobotGenome(baseGenome);
-    robots.push(new Robot(this.world, this.startX, this.startY, robotGenome));
+    this.robots.push(
+        new Robot(this.world, this.startX, this.startY, robotGenome));
   }
-  return robots;
+  return this.robots;
 };
 
 /**
@@ -43,21 +47,23 @@ Population.prototype.spawn = function(deadRobots) {
   deadRobots = deadRobots.sort(function(robotA, robotB) {
     return robotB.maxX - robotA.maxX;
   });
-  var bestRobot = deadRobots[0];
+  var eliteRobots = deadRobots.slice(0, this.eliteClones);
 
-  var robots = [];
+  this.robots = [];
   for (var i = 0; i < this.eliteClones; i++) {
-    var robotGenome = deadRobots[i].genome;
+    var robotGenome = eliteRobots[i].genome;
     var newRobot = new Robot(this.world, this.startX, this.startY, robotGenome);
-    robots.push(newRobot);
+    this.robots.push(newRobot);
   }
 
-  for (var i = this.eliteClones; i < deadRobots.length; i++) {
-    var robotGenome = this.mutateRobotGenome(bestRobot.genome);
+  for (var i = this.eliteClones; i < this.robotCount; i++) {
+    var randomElite = eliteRobots[Math.floor(Math.random() *
+                                  eliteRobots.length)];
+    var robotGenome = this.mutateRobotGenome(randomElite.genome);
     var newRobot = new Robot(this.world, this.startX, this.startY, robotGenome);
-    robots.push(newRobot);
+    this.robots.push(newRobot);
   }
-  return robots;
+  return this.robots;
 };
 
 /**
@@ -76,7 +82,10 @@ Population.prototype.mutateRobotGenome = function(robotGenome) {
  * @return {number} Mutated value
  */
 Population.prototype.mutate = function(value) {
-  var mutationRate = this.mutationRate;
+  var mutationRate = this.baseMutationRate;
+  if (Math.random() < this.mutationChance) {
+    mutationRate = this.mutationRate;
+  }
   if (Math.random() < this.extremeMutationChance) {
     mutationRate = this.extremeMutationRate;
   }

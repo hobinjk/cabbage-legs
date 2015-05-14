@@ -109,14 +109,14 @@ KlannLinkage.prototype.addCenteredRectangle = function(rectangle, x, y, angle) {
 KlannLinkage.prototype.addLinkage = function() {
   var bodies = {};
 
-  this.topSpindlyShape.collisionGroup = CONTACT_CHASSIS;
-  this.topSpindlyShape.collisionMask = GROUND;
+  this.topSpindlyShape.collisionGroup = CONTACT_TOP_SPINDLY;
+  this.topSpindlyShape.collisionMask = GROUND; // | CONTACT_BASE;
   bodies.topSpindlyBody = this.addCenteredRectangle(
                                 this.topSpindlyShape,
                                 2.5, 1 + this.topSpindlyShape.height / 2,
                                 Math.PI / 2);
 
-  this.bottomSpindlyShape.collisionGroup = CONTACT_CHASSIS;
+  this.bottomSpindlyShape.collisionGroup = CONTACT_ROBOT;
   this.bottomSpindlyShape.collisionMask = GROUND;
   bodies.bottomSpindlyBody = this.addRectangle(
                                 this.bottomSpindlyShape,
@@ -127,7 +127,7 @@ KlannLinkage.prototype.addLinkage = function() {
   bodies.bigLegBody = this.addCenteredRectangle(this.legShape, 3.5, 1,
                                              -Math.PI / 3);
 
-  this.middleSpindlyShape.collisionGroup = CONTACT_CHASSIS;
+  this.middleSpindlyShape.collisionGroup = CONTACT_ROBOT;
   this.middleSpindlyShape.collisionMask = GROUND;
   bodies.middleSpindlyBody = this.addCenteredRectangle(this.middleSpindlyShape,
                                            1, 0, -Math.PI / 7);
@@ -170,10 +170,14 @@ KlannLinkage.prototype.addLinkage = function() {
  * Place the klann linkage in the world.
  */
 KlannLinkage.prototype.add = function() {
-  this.baseShape.collisionMask = GROUND;
+  this.baseShape.collisionGroup = CONTACT_BASE;
+  this.baseShape.collisionMask = GROUND; // | CONTACT_TOP_SPINDLY;
+  // this.baseShape.width -= this.topSpindlyShape.height;
+
   this.baseBody = this.addRectangle(this.baseShape,
                                     this.baseShape.width / 2, 0, 0);
 
+  this.driverShape.collisionGroup = CONTACT_ROBOT;
   this.driverShape.collisionMask = GROUND;
   this.driverBody = this.addRectangle(this.driverShape,
                                  0,
@@ -182,6 +186,7 @@ KlannLinkage.prototype.add = function() {
   if (this.mirror) {
     driverMotorX = this.baseShape.width / 2;
   }
+
   this.driverMotor = new p2.RevoluteConstraint(this.driverBody, this.baseBody, {
     localPivotA: [0, 0],
     localPivotB: [driverMotorX, 0],

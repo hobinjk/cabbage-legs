@@ -1,5 +1,6 @@
 /**
  * Create a new NumberInput element
+ * @param {String} text
  * @param {number} low
  * @param {number} high
  * @param {Object} object
@@ -7,7 +8,8 @@
  * @param {boolean} isInteger
  * @constructor
  */
-function NumberInput(low, high, object, key, isInteger) {
+function NumberInput(text, low, high, object, key, isInteger) {
+  this.text = text;
   this.low = low;
   this.high = high;
   this.object = object;
@@ -25,18 +27,17 @@ NumberInput.prototype.add = function(parentElement) {
 
   this.labelElement = document.createElement('span');
   this.labelElement.classList.add('number-input-label');
-  this.labelElement.textContent = this.key;
+  this.labelElement.textContent = this.text;
 
   this.rangeElement = document.createElement('input');
   this.rangeElement.classList.add('number-input-range');
   this.rangeElement.type = 'range';
-  this.rangeElement.value = this.object[this.key];
-  this.rangeElement.min = this.low;
-  this.rangeElement.max = this.high;
-
   if (!this.isInteger) {
     this.rangeElement.step = (this.high - this.low) / 100;
   }
+  this.rangeElement.value = this.object[this.key];
+  this.rangeElement.min = this.low;
+  this.rangeElement.max = this.high;
 
   this.displayElement = document.createElement('span');
   this.displayElement.classList.add('number-input-display');
@@ -55,14 +56,18 @@ NumberInput.prototype.add = function(parentElement) {
  * Add event listeners to the range element
  */
 NumberInput.prototype.addEventListeners = function() {
-  this.rangeElement.addEventListener('change', this.handleChange.bind(this));
+  this.rangeElement.addEventListener('change', this.update.bind(this));
+  this.rangeElement.addEventListener('input', this.update.bind(this));
 };
 
 /**
- * Handle a change event
- * @param {Event} event
+ * Update the control
  */
-NumberInput.prototype.handleChange = function(event) {
-  this.displayElement.textContent = this.rangeElement.value;
-  this.object[this.key] = this.rangeElement.value;
+NumberInput.prototype.update = function() {
+  var newValue = this.rangeElement.value;
+  if (this.object[this.key] === newValue) {
+    return;
+  }
+  this.displayElement.textContent = newValue;
+  this.object[this.key] = newValue;
 };

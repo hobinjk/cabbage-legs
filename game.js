@@ -27,7 +27,7 @@ function startLinkages() {
     world.defaultContactMaterial.friction = 1000;
 
     terrain = new Terrain(world, -10, 0);
-    population = new Population(world, 0.1, 10, 1, 5, 7);
+    population = new Population(world, 8, 1, 5, 7);
 
     var guiParent = document.getElementById('gui-parent');
     gui = new GUI(guiParent, world, terrain, population);
@@ -36,8 +36,10 @@ function startLinkages() {
     // bottomSpindlyLength, middleSpindlyLength, legLength
     var klannGenome = new KlannGenome(2.5, 2, Math.PI / 6 + 0.3,
                                       1.8, 1.8 + 0.4, 0.9, 3.25, 5.5, 1 / 3);
-    var baseRobotGenome = new RobotGenome(3, 2, klannGenome, klannGenome);
-    robots = population.synthesize(baseRobotGenome, 10);
+    var baseRobotGenome = new RobotGenome(3, 2, 40, klannGenome, klannGenome);
+    robots = population.synthesize(baseRobotGenome);
+
+    terrain.update(50);
 
     updateFrame(this);
 

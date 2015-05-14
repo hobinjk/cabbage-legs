@@ -16,7 +16,8 @@ function Robot(world, x, y, genome) {
   this.alive = true;
   this.deathTime = 8000;
 
-  this.color = parseInt(ColorUtils.randomPastelHex(), 16);
+  // this.color = ColorUtils.fromHue(this.genome.hue);
+  this.color = ColorUtils.randomPastel();
 
   this.add();
 }
@@ -26,7 +27,7 @@ function Robot(world, x, y, genome) {
  */
 Robot.prototype.add = function() {
   var chassisShape = new p2.Rectangle(this.chassisLength, this.chassisWidth);
-  chassisShape.collisionGroup = CONTACT_CHASSIS;
+  chassisShape.collisionGroup = CONTACT_ROBOT;
   chassisShape.collisionMask = GROUND;
 
   this.chassis = new p2.Body({
@@ -108,7 +109,14 @@ Robot.prototype.update = function() {
   }
 
   if (this.lastMovement + this.deathTime < Date.now()) {
-    this.remove();
-    this.alive = false;
+    this.die();
   }
+};
+
+/**
+ * Murder the robot
+ */
+Robot.prototype.die = function() {
+  this.remove();
+  this.alive = false;
 };

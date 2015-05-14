@@ -1,3 +1,5 @@
 var CONTACT_LEG = 1;
-var CONTACT_CHASSIS = 2;
-var GROUND = 4;
+var CONTACT_ROBOT = 2;
+var CONTACT_BASE = 4;
+var CONTACT_TOP_SPINDLY = 8;
+var GROUND = 16;

@@ -2,32 +2,82 @@ function GUI(parentElement, world, terrain, population) {
   this.parentElement = parentElement;
   this.world = world;
   this.terrain = terrain;
+  this.terrain.onUpdate = this.onTerrainUpdate.bind(this);
+
   this.population = population;
 
-  this.eliteClonesElement = new NumberInput(0, population.robotCount,
+  this.eliteClonesElement = new NumberInput('Elite/breeding clones', 0,
+                                            4,
                                             population, 'eliteClones', true);
-  this.mutationRateElement = new NumberInput(0, 1, population, 'mutationRate',
+  this.baseMutationRateElement = new NumberInput('Base mutation rate', 0, 1,
+                                                 population,
+                                                 'baseMutationRate', false);
+  this.mutationChanceElement = new NumberInput('Chance of simple mutation', 0,
+                                               1, population, 'mutationChance',
+                                               false);
+  this.mutationRateElement = new NumberInput('Simple mutation rate', 0, 1,
+                                             population, 'mutationRate',
                                              false);
-  this.extremeMutationRateElement = new NumberInput(0, 1, population,
+  this.extremeMutationRateElement = new NumberInput('Extreme mutation rate', 0,
+                                                    1, population,
                                                     'extremeMutationRate',
                                                     false);
-  this.extremeMutationChanceElement = new NumberInput(0, 1, population,
-                                                     'extremeMutationChance',
-                                                     false);
+  this.extremeMutationChanceElement = new NumberInput(
+      'Chance of extreme mutation', 0, 1, population, 'extremeMutationChance',
+      false);
+
+  this.robotCountElement = new NumberInput('Robot count', 5, 12, population,
+                                           'robotCount', true);
+
+  this.regenerateTerrainElement = document.createElement('input');
+  this.regenerateTerrainElement.type = 'button';
+  this.regenerateTerrainElement.value = 'Regenerate Terrain';
+  this.regenerateTerrainElement.addEventListener('click', function() {
+    terrain.regenerate();
+  });
+
+  this.killAllRobotsElement = document.createElement('input');
+  this.killAllRobotsElement.type = 'button';
+  this.killAllRobotsElement.value = 'Kill All Robots';
+  this.killAllRobotsElement.addEventListener('click', function() {
+    var robots = population.robots;
+    for (var i = 0; i < robots.length; i++) {
+      robots[i].die();
+    }
+  });
 
   this.parentElement.classList.add('gui');
 
   this.eliteClonesElement.add(this.parentElement);
+  this.baseMutationRateElement.add(this.parentElement);
   this.mutationRateElement.add(this.parentElement);
+  this.mutationChanceElement.add(this.parentElement);
   this.extremeMutationRateElement.add(this.parentElement);
   this.extremeMutationChanceElement.add(this.parentElement);
+  this.robotCountElement.add(this.parentElement);
 
-  this.graphContainerChart = c3.generate({
-    bindto: '#gui-graph-container',
+  this.parentElement.appendChild(this.regenerateTerrainElement);
+  this.parentElement.appendChild(this.killAllRobotsElement);
+
+  this.distanceGraphContainer = c3.generate({
+    bindto: '#distance-graph-container',
     data: {
       columns: [
         ['best distance', 0],
         ['average distance', 0]
+      ]
+    }
+  });
+
+  this.terrainGraphContainer = c3.generate({
+    bindto: '#terrain-graph-container',
+    data: {
+      xs: {
+        'terrain': 'x'
+      },
+      columns: [
+        ['terrain', 0],
+        ['x', 0]
       ]
     }
   });
@@ -49,7 +99,7 @@ GUI.prototype.addGenerationResults = function(deadRobots) {
   var maxX = deadRobots[0].maxX;
   var averageX = 0;
   for (var i = 0; i < deadRobots.length; i++) {
-    averageX += deadRobots[0].maxX / deadRobots.length;
+    averageX += deadRobots[i].maxX / deadRobots.length;
   }
 
   this.bestDistances.push(maxX);
@@ -59,10 +109,34 @@ GUI.prototype.addGenerationResults = function(deadRobots) {
   var averageDistanceColumn = ['average distance']
                                   .concat(this.averageDistances);
 
-  this.graphContainerChart.load({
+  this.distanceGraphContainer.load({
     columns: [
       bestDistanceColumn,
       averageDistanceColumn
+    ]
+  });
+};
+
+/**
+ * Called by terrain when terrain is updated
+ */
+GUI.prototype.onTerrainUpdate = function() {
+  var ys = ['terrain'];
+  var xs = ['x'];
+
+  for (var i = 0; i < this.terrain.blockBodies.length; i++) {
+    var position = this.terrain.blockBodies[i].position;
+    xs.push(position[0]);
+    ys.push(position[1]);
+  }
+
+  this.terrainGraphContainer.load({
+    xs: {
+      'terrain': 'x'
+    },
+    columns: [
+      xs,
+      ys
     ]
   });
 };

@@ -23,8 +23,12 @@
 }
 */
 
-#gui-graph-container {
+.graph-container {
   float: left;
   width: 400px;
 }
 
+#container {
+  width: 100%;
+  height: 100%;
+}
