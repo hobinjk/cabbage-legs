@@ -22,8 +22,8 @@ function NumberInput(text, low, high, object, key, isInteger) {
  * @param {Element} parentElement
  */
 NumberInput.prototype.add = function(parentElement) {
-  this.containerElement = document.createElement('div');
-  this.containerElement.classList.add('number-input-container');
+  this.containerElement = document.createElement('tr');
+  this.containerElement.classList.add('number-input-row');
 
   this.labelElement = document.createElement('span');
   this.labelElement.classList.add('number-input-label');
@@ -43,9 +43,18 @@ NumberInput.prototype.add = function(parentElement) {
   this.displayElement.classList.add('number-input-display');
   this.displayElement.textContent = this.object[this.key];
 
-  this.containerElement.appendChild(this.labelElement);
-  this.containerElement.appendChild(this.rangeElement);
-  this.containerElement.appendChild(this.displayElement);
+  var containerElement = this.containerElement;
+
+  function appendChild(elt) {
+    var cell = document.createElement('td');
+    cell.classList.add('number-input-cell');
+    cell.appendChild(elt);
+    containerElement.appendChild(cell);
+  }
+
+  appendChild(this.labelElement);
+  appendChild(this.rangeElement);
+  appendChild(this.displayElement);
 
   parentElement.appendChild(this.containerElement);
 

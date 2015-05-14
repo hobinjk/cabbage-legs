@@ -22,6 +22,13 @@ function GUI(parentElement, world, terrain, population) {
                                                     1, population,
                                                     'extremeMutationRate',
                                                     false);
+  this.crossoverRateElement = new NumberInput('Crossover rate', 0, 1,
+                                              population, 'crossoverRate',
+                                              false);
+  this.selfCrossoverRateElement = new NumberInput('Self crossover rate', 0, 1,
+                                                  population,
+                                                  'selfCrossoverRate', false);
+
   this.extremeMutationChanceElement = new NumberInput(
       'Chance of extreme mutation', 0, 1, population, 'extremeMutationChance',
       false);
@@ -48,14 +55,20 @@ function GUI(parentElement, world, terrain, population) {
 
   this.parentElement.classList.add('gui');
 
-  this.eliteClonesElement.add(this.parentElement);
-  this.baseMutationRateElement.add(this.parentElement);
-  this.mutationRateElement.add(this.parentElement);
-  this.mutationChanceElement.add(this.parentElement);
-  this.extremeMutationRateElement.add(this.parentElement);
-  this.extremeMutationChanceElement.add(this.parentElement);
-  this.robotCountElement.add(this.parentElement);
+  var numberInputContainer = document.createElement('table');
+  numberInputContainer.classList.add('number-input-container');
 
+  this.robotCountElement.add(numberInputContainer);
+  this.eliteClonesElement.add(numberInputContainer);
+  this.baseMutationRateElement.add(numberInputContainer);
+  this.mutationRateElement.add(numberInputContainer);
+  this.mutationChanceElement.add(numberInputContainer);
+  this.extremeMutationRateElement.add(numberInputContainer);
+  this.extremeMutationChanceElement.add(numberInputContainer);
+  this.crossoverRateElement.add(numberInputContainer);
+  this.selfCrossoverRateElement.add(numberInputContainer);
+
+  this.parentElement.appendChild(numberInputContainer);
   this.parentElement.appendChild(this.regenerateTerrainElement);
   this.parentElement.appendChild(this.killAllRobotsElement);
 
