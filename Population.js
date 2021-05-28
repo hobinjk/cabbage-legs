@@ -51,6 +51,9 @@ Population.prototype.spawn = function(deadRobots) {
     return robotB.maxX - robotA.maxX;
   });
   var eliteRobots = deadRobots.slice(0, this.eliteClones);
+  if (eliteRobots.length === 0) {
+    eliteRobots = deadRobots;
+  }
 
   function getRandomElite() {
     return eliteRobots[Math.floor(Math.random() *
