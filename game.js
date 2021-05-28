@@ -53,6 +53,9 @@ function startLinkages() {
 }
 
 function smooth(oldVal, newVal, alphaBase) {
+  if (isNaN(oldVal)) {
+    return newVal;
+  }
   var alpha = alphaBase * Math.max(Math.abs((oldVal - newVal) / 4), 1);
   return oldVal * (1 - alpha) + newVal * alpha;
 }
