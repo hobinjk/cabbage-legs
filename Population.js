@@ -51,13 +51,19 @@ Population.prototype.spawn = function(deadRobots) {
     return robotB.maxX - robotA.maxX;
   });
   var eliteRobots = deadRobots.slice(0, this.eliteClones);
-  if (eliteRobots.length === 0) {
-    eliteRobots = deadRobots;
-  }
 
   function getRandomElite() {
-    return eliteRobots[Math.floor(Math.random() *
-                                  eliteRobots.length)];
+    if (eliteRobots.length > 0) {
+      return eliteRobots[Math.floor(Math.random() *
+                                    eliteRobots.length)];
+    }
+
+    for (let i = 0; i < deadRobots.length; i++) {
+      if (Math.random() < 0.5) {
+        return deadRobots[i];
+      }
+    }
+    return deadRobots[0];
   }
 
   this.robots = [];
